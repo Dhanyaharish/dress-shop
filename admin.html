@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Shop Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <header class="top">
+    <h1 data-i18n="app.title">Shop Manager</h1>
+    <div class="top-actions">
+      <button id="alertBtn" class="chip" type="button">Enable alerts</button>
+      <button id="langBtn" class="chip" type="button">ಕನ್ನಡ</button>
+    </div>
+  </header>
+
+  <!-- Red banner shown whenever any item has fewer than 3 pieces -->
+  <div id="lowBanner" class="banner" hidden></div>
+
+  <main>
+
+    <!-- HOME -->
+    <section id="tab-home" class="tab active">
+      <div class="stats">
+        <div class="stat"><span class="stat-label" data-i18n="dash.today">Today's sales</span><strong id="statToday">₹0</strong></div>
+        <div class="stat"><span class="stat-label" data-i18n="dash.month">This month</span><strong id="statMonth">₹0</strong></div>
+        <div class="stat"><span class="stat-label" data-i18n="dash.items">Pieces in stock</span><strong id="statPieces">0</strong></div>
+        <div class="stat"><span class="stat-label" data-i18n="dash.low">Low stock items</span><strong id="statLow">0</strong></div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="dash.lowList">Needs restocking</h2>
+        <div id="lowList"></div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="dash.backup">Backup</h2>
+        <p class="muted" data-i18n="dash.backupHelp">Your data is saved on this phone/browser only. Download a backup often.</p>
+        <div class="btn-row">
+          <button id="exportBtn" class="btn" type="button" data-i18n="btn.export">Download backup</button>
+          <label class="btn btn-light" for="importFile" data-i18n="btn.import">Restore backup</label>
+          <input id="importFile" type="file" accept="application/json,.json" hidden />
+        </div>
+      </div>
+    </section>
+
+    <!-- STOCK -->
+    <section id="tab-stock" class="tab">
+      <form id="itemForm" class="card" autocomplete="off">
+        <h2 id="itemFormTitle" data-i18n="stock.add">Add item</h2>
+        <input type="hidden" id="itemId" />
+        <label><span data-i18n="f.name">Item name</span>
+          <input id="itemName" type="text" required maxlength="80" /></label>
+        <label><span data-i18n="f.category">Category</span>
+          <input id="itemCategory" type="text" maxlength="40" placeholder="Saree, Kurti..." /></label>
+        <div class="two">
+          <label><span data-i18n="f.cost">Cost price (₹)</span>
+            <input id="itemCost" type="number" inputmode="decimal" min="0" step="any" /></label>
+          <label><span data-i18n="f.price">Selling price (₹)</span>
+            <input id="itemPrice" type="number" inputmode="decimal" min="0" step="any" /></label>
+        </div>
+        <label><span data-i18n="f.qty">Quantity</span>
+          <input id="itemQty" type="number" inputmode="numeric" min="0" step="1" value="0" /></label>
+        <div class="btn-row">
+          <button class="btn" type="submit" data-i18n="btn.save">Save</button>
+          <button id="itemCancel" class="btn btn-light" type="button" data-i18n="btn.cancel" hidden>Cancel</button>
+        </div>
+      </form>
+
+      <input id="stockSearch" class="search" type="search" data-i18n-ph="stock.search" placeholder="Search items" />
+      <div id="stockList"></div>
+    </section>
+
+    <!-- SALES -->
+    <section id="tab-sales" class="tab">
+      <form id="saleForm" class="card" autocomplete="off">
+        <h2 data-i18n="sales.record">Record a sale</h2>
+        <label><span data-i18n="f.item">Item</span>
+          <select id="saleItem" required></select></label>
+        <div class="two">
+          <label><span data-i18n="f.saleQty">Quantity sold</span>
+            <input id="saleQty" type="number" inputmode="numeric" min="1" step="1" value="1" required /></label>
+          <label><span data-i18n="f.salePrice">Price per piece (₹)</span>
+            <input id="salePrice" type="number" inputmode="decimal" min="0" step="any" required /></label>
+        </div>
+        <label><span data-i18n="f.date">Date</span>
+          <input id="saleDate" type="date" required /></label>
+        <button class="btn" type="submit" data-i18n="btn.sell">Record sale</button>
+      </form>
+
+      <div class="card">
+        <h2><span data-i18n="sales.history">Recent sales</span> · <span id="todayTotal" class="muted">₹0</span></h2>
+        <div id="salesList"></div>
+      </div>
+    </section>
+
+    <!-- BILLS -->
+    <section id="tab-bills" class="tab">
+      <form id="billForm" class="card" autocomplete="off">
+        <h2 data-i18n="bills.add">Save wholesale bill</h2>
+        <label><span data-i18n="f.photo">Photo of the list</span>
+          <input id="billPhoto" type="file" accept="image/*" /></label>
+        <img id="billPreview" class="preview" alt="" hidden />
+        <label><span data-i18n="f.supplier">Supplier</span>
+          <input id="billSupplier" type="text" maxlength="80" /></label>
+        <div class="two">
+          <label><span data-i18n="f.date">Date</span>
+            <input id="billDate" type="date" required /></label>
+          <label><span data-i18n="f.amount">Total amount (₹)</span>
+            <input id="billAmount" type="number" inputmode="decimal" min="0" step="any" /></label>
+        </div>
+        <label><span data-i18n="f.note">Note</span>
+          <input id="billNote" type="text" maxlength="120" /></label>
+        <button class="btn" type="submit" data-i18n="btn.save">Save</button>
+      </form>
+
+      <div class="card">
+        <h2 data-i18n="bills.history">Saved bills</h2>
+        <div id="billList"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="home" type="button" data-i18n="nav.home">Home</button>
+    <button class="nav-btn" data-tab="stock" type="button" data-i18n="nav.stock">Stock</button>
+    <button class="nav-btn" data-tab="sales" type="button" data-i18n="nav.sales">Sales</button>
+    <button class="nav-btn" data-tab="bills" type="button" data-i18n="nav.bills">Bills</button>
+  </nav>
+
+  <!-- Full-size bill photo viewer -->
+  <div id="viewer" class="viewer" hidden>
+    <button id="viewerClose" class="btn btn-light" type="button" data-i18n="btn.close">Close</button>
+    <img id="viewerImg" alt="" />
+    <p id="viewerCaption"></p>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
