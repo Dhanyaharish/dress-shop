@@ -6,6 +6,7 @@
 
 (function () {
   "use strict";
+  if (!window.ShopAuth || !ShopAuth.isLoggedIn()) return; // the login page comes first
 
   // Alert when an item has LESS than this many pieces (so 0, 1 or 2).
   const LOW_LIMIT = 3;
@@ -16,6 +17,40 @@
   const I18N = {
     en: {
       "app.title": "Shop Manager",
+      "set.title": "Shop details", "set.shopName": "Shop name",
+      "nav.reports": "Reports",
+      "rep.title": "Sales & Stock Report", "rep.make": "Make a report", "rep.period": "Report for",
+      "rep.day": "Day", "rep.week": "Week (Mon–Sun)", "rep.month": "Month", "rep.year": "Year",
+      "rep.pickDate": "Choose any date inside the period", "rep.covers": "Covers",
+      "rep.download": "Download PDF",
+      "rep.howto": "A print window opens. Choose 'Save as PDF' as the printer, then tap Save.",
+      "rep.generated": "Generated on", "rep.summary": "Summary",
+      "rep.totalSales": "Total sales", "rep.salesCount": "Number of sales",
+      "rep.piecesSold": "Pieces sold", "rep.bought": "Bought from wholesale",
+      "rep.breakdown": "Sales by day", "rep.breakdownMonth": "Sales by month",
+      "rep.byItem": "Sales by item", "rep.salesList": "All sales",
+      "rep.stock": "Current stock",
+      "rep.stockNote": "Stock is shown as it is today. Past stock levels are not recorded.",
+      "rep.bills": "Wholesale bills", "rep.none": "Nothing recorded in this period.",
+      "rep.piecesTotal": "Total pieces", "rep.valueCost": "Value at cost price", "rep.valueSell": "Value at selling price",
+      "col.date": "Date", "col.month": "Month", "col.item": "Item", "col.qty": "Qty", "col.price": "Price",
+      "col.total": "Total", "col.category": "Category", "col.cost": "Cost", "col.value": "Value",
+      "col.status": "Status", "col.supplier": "Supplier", "col.amount": "Amount", "col.note": "Note",
+      "stock.ok": "OK",
+      "lock.lockNow": "Log out", "lock.password": "Password", "lock.unlock": "Unlock",
+      "lock.wrong": "Wrong password.",
+      "lock.forgot": "Forgot the password? It cannot be recovered. Clearing this browser's site data removes it, but also erases the saved stock and sales unless you have a backup.",
+      "pw.title": "Password",
+      "pw.on": "A password is required to open the manager. Closing the tab or tapping Log out asks for it again.",
+      "pw.off": "No password set. Anyone who opens this page on this phone can use the manager.",
+      "pw.current": "Current password", "pw.new": "New password", "pw.confirm": "Confirm new password",
+      "pw.save": "Save password", "pw.remove": "Remove password",
+      "pw.short": "Use at least 4 characters.",
+      "pw.mismatch": "The two passwords do not match.",
+      "pw.wrongCurrent": "Current password is wrong.",
+      "pw.removed": "Password removed",
+      "pw.removeConfirm": "Remove the password?",
+      "pw.needHttps": "Passwords need a secure (https) page. Open the site from its https link.",
       "btn.enableAlerts": "Enable alerts",
       "btn.alertsOn": "Alerts on",
       "nav.home": "Home", "nav.stock": "Stock", "nav.sales": "Sales", "nav.bills": "Bills",
@@ -62,6 +97,40 @@
     },
     kn: {
       "app.title": "ಅಂಗಡಿ ನಿರ್ವಹಣೆ",
+      "set.title": "ಅಂಗಡಿಯ ವಿವರಗಳು", "set.shopName": "ಅಂಗಡಿಯ ಹೆಸರು",
+      "nav.reports": "ವರದಿಗಳು",
+      "rep.title": "ಮಾರಾಟ ಮತ್ತು ಸ್ಟಾಕ್ ವರದಿ", "rep.make": "ವರದಿ ತಯಾರಿಸಿ", "rep.period": "ವರದಿ ಯಾವ ಅವಧಿಗೆ",
+      "rep.day": "ದಿನ", "rep.week": "ವಾರ (ಸೋಮ–ಭಾನು)", "rep.month": "ತಿಂಗಳು", "rep.year": "ವರ್ಷ",
+      "rep.pickDate": "ಅವಧಿಯೊಳಗಿನ ಯಾವುದೇ ದಿನಾಂಕ ಆರಿಸಿ", "rep.covers": "ಅವಧಿ",
+      "rep.download": "PDF ಡೌನ್‌ಲೋಡ್",
+      "rep.howto": "ಪ್ರಿಂಟ್ ವಿಂಡೋ ತೆರೆಯುತ್ತದೆ. ಪ್ರಿಂಟರ್ ಆಗಿ 'Save as PDF' ಆರಿಸಿ, ನಂತರ Save ಒತ್ತಿ.",
+      "rep.generated": "ತಯಾರಿಸಿದ ದಿನಾಂಕ", "rep.summary": "ಸಾರಾಂಶ",
+      "rep.totalSales": "ಒಟ್ಟು ಮಾರಾಟ", "rep.salesCount": "ಮಾರಾಟಗಳ ಸಂಖ್ಯೆ",
+      "rep.piecesSold": "ಮಾರಿದ ಪೀಸ್‌ಗಳು", "rep.bought": "ಸಗಟು ಖರೀದಿ",
+      "rep.breakdown": "ದಿನವಾರು ಮಾರಾಟ", "rep.breakdownMonth": "ತಿಂಗಳವಾರು ಮಾರಾಟ",
+      "rep.byItem": "ವಸ್ತುವಾರು ಮಾರಾಟ", "rep.salesList": "ಎಲ್ಲಾ ಮಾರಾಟಗಳು",
+      "rep.stock": "ಈಗಿನ ಸ್ಟಾಕ್",
+      "rep.stockNote": "ಸ್ಟಾಕ್ ಇಂದಿನ ಸ್ಥಿತಿಯಲ್ಲಿ ತೋರಿಸಲಾಗಿದೆ. ಹಿಂದಿನ ಸ್ಟಾಕ್ ದಾಖಲಾಗುವುದಿಲ್ಲ.",
+      "rep.bills": "ಸಗಟು ಬಿಲ್‌ಗಳು", "rep.none": "ಈ ಅವಧಿಯಲ್ಲಿ ಏನೂ ದಾಖಲಾಗಿಲ್ಲ.",
+      "rep.piecesTotal": "ಒಟ್ಟು ಪೀಸ್‌ಗಳು", "rep.valueCost": "ಖರೀದಿ ಬೆಲೆಯಲ್ಲಿ ಮೌಲ್ಯ", "rep.valueSell": "ಮಾರಾಟ ಬೆಲೆಯಲ್ಲಿ ಮೌಲ್ಯ",
+      "col.date": "ದಿನಾಂಕ", "col.month": "ತಿಂಗಳು", "col.item": "ವಸ್ತು", "col.qty": "ಸಂಖ್ಯೆ", "col.price": "ಬೆಲೆ",
+      "col.total": "ಒಟ್ಟು", "col.category": "ವರ್ಗ", "col.cost": "ಖರೀದಿ", "col.value": "ಮೌಲ್ಯ",
+      "col.status": "ಸ್ಥಿತಿ", "col.supplier": "ಸರಬರಾಜುದಾರ", "col.amount": "ಮೊತ್ತ", "col.note": "ಟಿಪ್ಪಣಿ",
+      "stock.ok": "ಸರಿ ಇದೆ",
+      "lock.lockNow": "ಲಾಗ್ ಔಟ್", "lock.password": "ಪಾಸ್‌ವರ್ಡ್", "lock.unlock": "ತೆರೆಯಿರಿ",
+      "lock.wrong": "ತಪ್ಪು ಪಾಸ್‌ವರ್ಡ್.",
+      "lock.forgot": "ಪಾಸ್‌ವರ್ಡ್ ಮರೆತಿರಾ? ಅದನ್ನು ಮರಳಿ ಪಡೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ. ಈ ಬ್ರೌಸರ್‌ನ ಸೈಟ್ ಡೇಟಾ ಅಳಿಸಿದರೆ ಪಾಸ್‌ವರ್ಡ್ ಹೋಗುತ್ತದೆ, ಆದರೆ ಬ್ಯಾಕಪ್ ಇಲ್ಲದಿದ್ದರೆ ಸ್ಟಾಕ್ ಮತ್ತು ಮಾರಾಟದ ಡೇಟಾವೂ ಅಳಿಯುತ್ತದೆ.",
+      "pw.title": "ಪಾಸ್‌ವರ್ಡ್",
+      "pw.on": "ಮ್ಯಾನೇಜರ್ ತೆರೆಯಲು ಪಾಸ್‌ವರ್ಡ್ ಬೇಕು. ಟ್ಯಾಬ್ ಮುಚ್ಚಿದರೆ ಅಥವಾ ಲಾಗ್ ಔಟ್ ಒತ್ತಿದರೆ ಮತ್ತೆ ಕೇಳುತ್ತದೆ.",
+      "pw.off": "ಪಾಸ್‌ವರ್ಡ್ ಇಲ್ಲ. ಈ ಫೋನ್‌ನಲ್ಲಿ ಈ ಪುಟ ತೆರೆದ ಯಾರಾದರೂ ಬಳಸಬಹುದು.",
+      "pw.current": "ಈಗಿನ ಪಾಸ್‌ವರ್ಡ್", "pw.new": "ಹೊಸ ಪಾಸ್‌ವರ್ಡ್", "pw.confirm": "ಹೊಸ ಪಾಸ್‌ವರ್ಡ್ ಖಚಿತಪಡಿಸಿ",
+      "pw.save": "ಪಾಸ್‌ವರ್ಡ್ ಉಳಿಸಿ", "pw.remove": "ಪಾಸ್‌ವರ್ಡ್ ತೆಗೆಯಿರಿ",
+      "pw.short": "ಕನಿಷ್ಠ 4 ಅಕ್ಷರ ಬಳಸಿ.",
+      "pw.mismatch": "ಎರಡೂ ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಹೊಂದುತ್ತಿಲ್ಲ.",
+      "pw.wrongCurrent": "ಈಗಿನ ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ.",
+      "pw.removed": "ಪಾಸ್‌ವರ್ಡ್ ತೆಗೆದಿದೆ",
+      "pw.removeConfirm": "ಪಾಸ್‌ವರ್ಡ್ ತೆಗೆಯಬೇಕೇ?",
+      "pw.needHttps": "ಪಾಸ್‌ವರ್ಡ್‌ಗೆ ಸುರಕ್ಷಿತ (https) ಪುಟ ಬೇಕು. https ಲಿಂಕ್‌ನಿಂದ ತೆರೆಯಿರಿ.",
       "btn.enableAlerts": "ಎಚ್ಚರಿಕೆ ಆನ್ ಮಾಡಿ",
       "btn.alertsOn": "ಎಚ್ಚರಿಕೆ ಆನ್ ಆಗಿದೆ",
       "nav.home": "ಮುಖಪುಟ", "nav.stock": "ಸ್ಟಾಕ್", "nav.sales": "ಮಾರಾಟ", "nav.bills": "ಬಿಲ್‌ಗಳು",
@@ -145,14 +214,17 @@
   }
 
   /* ---------- Saved data (items, sales, bills) ---------- */
-  let data = { items: [], sales: [], bills: [] };
+  let data = { items: [], sales: [], bills: [], settings: { shopName: "" } };
 
   function loadData() {
     try {
       const raw = localStorage.getItem(LS_KEY);
       if (raw) {
         const d = JSON.parse(raw);
-        data = { items: d.items || [], sales: d.sales || [], bills: d.bills || [] };
+        data = {
+          items: d.items || [], sales: d.sales || [], bills: d.bills || [],
+          settings: d.settings && typeof d.settings === "object" ? d.settings : { shopName: "" }
+        };
       }
     } catch (e) { /* start empty */ }
   }
@@ -245,12 +317,20 @@
   }
 
   /* ---------- Rendering ---------- */
+  // The shop name typed by the owner; falls back to "Shop Manager".
+  function shopTitle() {
+    return (data.settings && data.settings.shopName) || t("app.title");
+  }
+  function renderTitle() {
+    $("appTitle").textContent = shopTitle();
+  }
+
   function renderBanner() {
     const low = lowItems();
     const b = $("lowBanner");
     b.hidden = low.length === 0;
     b.textContent = "⚠ " + t("banner.low", { n: low.length });
-    document.title = (low.length ? "(" + low.length + ") " : "") + t("app.title");
+    document.title = (low.length ? "(" + low.length + ") " : "") + shopTitle();
   }
 
   function renderDashboard() {
@@ -347,12 +427,14 @@
   }
 
   function renderAll() {
+    renderTitle();
     renderBanner();
     renderDashboard();
     renderStock();
     renderSaleSelect();
     renderSales();
     renderBills();
+    renderReport();
   }
 
   function applyLang() {
@@ -363,8 +445,17 @@
     $("langBtn").textContent = lang === "en" ? "ಕನ್ನಡ" : "English";
     if ($("itemId").value) $("itemFormTitle").textContent = t("stock.edit");
     updateAlertBtn();
+    renderPasswordUI();
     renderAll();
   }
+
+  /* ---------- Shop name ---------- */
+  $("settingsForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    data.settings = { shopName: $("shopName").value.trim() };
+    if (saveData()) toast(t("msg.saved"));
+    renderAll();
+  });
 
   /* ---------- Tabs ---------- */
   function showTab(name) {
@@ -549,12 +640,183 @@
   });
   $("viewerClose").addEventListener("click", () => { $("viewer").hidden = true; });
 
+  /* ---------- Reports (saved as PDF through the print window) ---------- */
+  function pad2(n) { return String(n).padStart(2, "0"); }
+  function toYmd(d) { return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+  function fromYmd(s) {
+    const p = String(s).split("-");
+    return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+  }
+
+  // First and last day of the chosen day / week (Mon-Sun) / month / year.
+  function periodRange(kind, dateStr) {
+    const d = fromYmd(dateStr);
+    const y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
+    if (kind === "day") return [toYmd(d), toYmd(d)];
+    if (kind === "week") {
+      const back = (d.getDay() + 6) % 7; // days since Monday
+      return [toYmd(new Date(y, m, day - back)), toYmd(new Date(y, m, day - back + 6))];
+    }
+    if (kind === "month") return [toYmd(new Date(y, m, 1)), toYmd(new Date(y, m + 1, 0))];
+    return [toYmd(new Date(y, 0, 1)), toYmd(new Date(y, 11, 31))];
+  }
+
+  function monthLabel(y, m) {
+    try {
+      return new Date(y, m, 1).toLocaleDateString(lang === "kn" ? "kn-IN" : "en-IN", { month: "long", year: "numeric" });
+    } catch (e) { return pad2(m + 1) + "/" + y; }
+  }
+
+  function periodLabel(kind, start, end) {
+    const s = fromYmd(start);
+    if (kind === "day") return fmtDate(start);
+    if (kind === "week") return fmtDate(start) + " – " + fmtDate(end);
+    if (kind === "month") return monthLabel(s.getFullYear(), s.getMonth());
+    return String(s.getFullYear());
+  }
+
+  // aligns: "l" (left) or "r" (right) for each column. foot is an optional totals row.
+  function tbl(heads, aligns, rows, foot) {
+    const cell = (tag, v, i) => "<" + tag + " class='" + aligns[i] + "'>" + esc(v) + "</" + tag + ">";
+    let h = "<table class='rtable'><thead><tr>" + heads.map((x, i) => cell("th", x, i)).join("") +
+      "</tr></thead><tbody>";
+    h += rows.map((r) => "<tr>" + r.map((x, i) => cell("td", x, i)).join("") + "</tr>").join("");
+    h += "</tbody>";
+    if (foot) h += "<tfoot><tr>" + foot.map((x, i) => cell("td", x, i)).join("") + "</tr></tfoot>";
+    return h + "</table>";
+  }
+  function kv(label, value) {
+    return "<div><span>" + esc(label) + "</span><strong>" + esc(value) + "</strong></div>";
+  }
+  function section(title) { return "<h4>" + esc(title) + "</h4>"; }
+  function none() { return "<p class='r-none'>" + esc(t("rep.none")) + "</p>"; }
+
+  function buildReport(kind, start, end) {
+    const inRange = (d) => String(d) >= start && String(d) <= end;
+    const sales = data.sales.filter((s) => inRange(s.date))
+      .sort((a, b) => String(a.date).localeCompare(String(b.date)) || a.ts - b.ts);
+    const bills = data.bills.filter((b) => inRange(b.date))
+      .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+
+    let total = 0, pieces = 0, bought = 0;
+    sales.forEach((s) => { total += s.qty * s.price; pieces += s.qty; });
+    bills.forEach((b) => { bought += num(b.amount); });
+
+    // Heading
+    let h = "<div class='r-head'><h2>" + esc(shopTitle()) + "</h2><h3>" + esc(t("rep.title")) + "</h3>" +
+      "<p><strong>" + esc(periodLabel(kind, start, end)) + "</strong></p>" +
+      "<p class='r-small'>" + esc(t("rep.generated")) + ": " + fmtDate(todayStr()) + "</p></div>";
+
+    // Summary
+    h += section(t("rep.summary")) + "<div class='r-sum'>" +
+      kv(t("rep.totalSales"), money(total)) + kv(t("rep.salesCount"), sales.length) +
+      kv(t("rep.piecesSold"), pieces) + kv(t("rep.bought"), money(bought)) + "</div>";
+
+    // Sales
+    if (sales.length) {
+      if (kind !== "day") {
+        const groups = {};
+        sales.forEach((s) => {
+          const key = kind === "year" ? String(s.date).slice(0, 7) : String(s.date);
+          const g = groups[key] || (groups[key] = { qty: 0, amt: 0 });
+          g.qty += s.qty;
+          g.amt += s.qty * s.price;
+        });
+        const keys = Object.keys(groups).sort();
+        const label = (k) => kind === "year"
+          ? monthLabel(Number(k.slice(0, 4)), Number(k.slice(5, 7)) - 1) : fmtDate(k);
+        h += section(t(kind === "year" ? "rep.breakdownMonth" : "rep.breakdown")) +
+          tbl([t(kind === "year" ? "col.month" : "col.date"), t("col.qty"), t("col.total")], ["l", "r", "r"],
+            keys.map((k) => [label(k), String(groups[k].qty), money(groups[k].amt)]),
+            [t("col.total"), String(pieces), money(total)]);
+      }
+
+      const byItem = {};
+      sales.forEach((s) => {
+        const key = s.itemId || s.name;
+        const g = byItem[key] || (byItem[key] = { name: s.name, qty: 0, amt: 0 });
+        g.qty += s.qty;
+        g.amt += s.qty * s.price;
+      });
+      const list = Object.keys(byItem).map((k) => byItem[k]).sort((a, b) => b.amt - a.amt);
+      h += section(t("rep.byItem")) +
+        tbl([t("col.item"), t("col.qty"), t("col.total")], ["l", "r", "r"],
+          list.map((g) => [g.name, String(g.qty), money(g.amt)]),
+          [t("col.total"), String(pieces), money(total)]);
+
+      h += section(t("rep.salesList")) +
+        tbl([t("col.date"), t("col.item"), t("col.qty"), t("col.price"), t("col.total")],
+          ["l", "l", "r", "r", "r"],
+          sales.map((s) => [fmtDate(s.date), s.name, String(s.qty), money(s.price), money(s.qty * s.price)]),
+          ["", t("col.total"), String(pieces), "", money(total)]);
+    } else {
+      h += section(t("rep.salesList")) + none();
+    }
+
+    // Stock (always as it is today)
+    const items = data.items.slice().sort((a, b) => a.name.localeCompare(b.name));
+    let pcs = 0, valueCost = 0, valueSell = 0, lows = 0;
+    items.forEach((i) => {
+      pcs += i.qty;
+      valueCost += i.qty * num(i.cost);
+      valueSell += i.qty * num(i.price);
+      if (i.qty < LOW_LIMIT) lows++;
+    });
+    h += section(t("rep.stock")) + "<p class='r-small'>" + esc(t("rep.stockNote")) + "</p>" +
+      "<div class='r-sum'>" + kv(t("rep.piecesTotal"), pcs) + kv(t("dash.low"), lows) +
+      kv(t("rep.valueCost"), money(valueCost)) + kv(t("rep.valueSell"), money(valueSell)) + "</div>";
+    h += items.length
+      ? tbl([t("col.item"), t("col.category"), t("col.qty"), t("col.cost"), t("col.price"), t("col.value"), t("col.status")],
+          ["l", "l", "r", "r", "r", "r", "l"],
+          items.map((i) => [
+            i.name, i.category || "", String(i.qty), money(i.cost), money(i.price), money(i.qty * num(i.cost)),
+            i.qty === 0 ? t("stock.out") : i.qty < LOW_LIMIT ? t("stock.low") : t("stock.ok")
+          ]))
+      : none();
+
+    // Wholesale bills bought in the period
+    h += section(t("rep.bills"));
+    h += bills.length
+      ? tbl([t("col.date"), t("col.supplier"), t("col.note"), t("col.amount")], ["l", "l", "l", "r"],
+          bills.map((b) => [fmtDate(b.date), b.supplier || "—", b.note || "", b.amount ? money(b.amount) : ""]),
+          ["", "", t("col.total"), money(bought)])
+      : none();
+
+    return h;
+  }
+
+  function reportChoice() {
+    const kind = $("repKind").value || "day";
+    const range = periodRange(kind, $("repDate").value || todayStr());
+    return { kind: kind, start: range[0], end: range[1] };
+  }
+
+  function renderReport() {
+    const r = reportChoice();
+    $("repRange").textContent = t("rep.covers") + ": " + fmtDate(r.start) +
+      (r.start === r.end ? "" : " – " + fmtDate(r.end));
+    $("reportPreview").innerHTML = buildReport(r.kind, r.start, r.end);
+  }
+
+  $("repKind").addEventListener("change", renderReport);
+  $("repDate").addEventListener("change", renderReport);
+  $("repDate").addEventListener("input", renderReport);
+
+  $("repDownload").addEventListener("click", () => {
+    const r = reportChoice();
+    renderReport();
+    // The browser uses the page title as the default PDF file name.
+    document.title = "Sales-Stock-Report-" + r.start + (r.start === r.end ? "" : "_to_" + r.end);
+    window.addEventListener("afterprint", renderBanner, { once: true });
+    window.print();
+  });
+
   /* ---------- Backup ---------- */
   $("exportBtn").addEventListener("click", () => {
     photoAll().catch(() => []).then((photos) => {
       const payload = {
         version: 1, exported: new Date().toISOString(),
-        items: data.items, sales: data.sales, bills: data.bills, photos: photos || []
+        items: data.items, sales: data.sales, bills: data.bills, settings: data.settings, photos: photos || []
       };
       const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
       const a = document.createElement("a");
@@ -579,7 +841,11 @@
         return;
       }
       if (!confirm(t("msg.restoreConfirm"))) return;
-      data = { items: d.items, sales: d.sales, bills: d.bills };
+      data = {
+        items: d.items, sales: d.sales, bills: d.bills,
+        settings: d.settings && typeof d.settings === "object" ? d.settings : { shopName: "" }
+      };
+      $("shopName").value = data.settings.shopName || "";
       saveData();
       photoClear().catch(() => {})
         .then(() => Promise.all((d.photos || []).map((p) => photoPut(p.id, p.dataUrl))))
@@ -590,10 +856,34 @@
     e.target.value = "";
   });
 
+  /* ---------- Password (the login itself is on login.html) ---------- */
+  function renderPasswordUI() {
+    $("pwStatus").textContent = t("pw.on");
+  }
+
+  $("lockBtn").addEventListener("click", () => ShopAuth.logout());
+
+  $("passwordForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const pw = $("pwNew").value;
+    if (!ShopAuth.canHash()) { toast(t("pw.needHttps")); return; }
+    if (pw.length < 4) { toast(t("pw.short")); return; }
+    if (pw !== $("pwConfirm").value) { toast(t("pw.mismatch")); return; }
+    ShopAuth.checkPassword($("pwCurrent").value).then((ok) => {
+      if (!ok) { toast(t("pw.wrongCurrent")); return; }
+      return ShopAuth.createLock(pw).then(() => {
+        $("passwordForm").reset();
+        toast(t("msg.saved"));
+      });
+    }).catch(() => toast(t("msg.saveFail")));
+  });
+
   /* ---------- Start ---------- */
   loadData();
   $("saleDate").value = todayStr();
+  $("repDate").value = todayStr();
   $("billDate").value = todayStr();
+  $("shopName").value = data.settings.shopName || "";
   applyLang();
 
   if ("serviceWorker" in navigator) {

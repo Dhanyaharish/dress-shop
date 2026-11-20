@@ -8,13 +8,25 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    // Not logged in? Go to the login page before anything is shown.
+    (function () {
+      try {
+        if (!localStorage.getItem("shopManagerLock.v1") || sessionStorage.getItem("shopManagerAuth") !== "1") {
+          document.documentElement.style.display = "none";
+          location.replace("login.html");
+        }
+      } catch (e) { location.replace("login.html"); }
+    })();
+  </script>
   <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
 
   <header class="top">
-    <h1 data-i18n="app.title">Shop Manager</h1>
+    <h1 id="appTitle">Shop Manager</h1>
     <div class="top-actions">
+      <button id="lockBtn" class="chip" type="button" data-i18n="lock.lockNow">Log out</button>
       <button id="alertBtn" class="chip" type="button">Enable alerts</button>
       <button id="langBtn" class="chip" type="button">ಕನ್ನಡ</button>
     </div>
@@ -27,6 +39,26 @@
 
     <!-- HOME -->
     <section id="tab-home" class="tab active">
+      <form id="settingsForm" class="card" autocomplete="off">
+        <h2 data-i18n="set.title">Shop details</h2>
+        <label><span data-i18n="set.shopName">Shop name</span>
+          <input id="shopName" type="text" maxlength="60" /></label>
+        <button class="btn" type="submit" data-i18n="btn.save">Save</button>
+      </form>
+
+      <form id="passwordForm" class="card" autocomplete="off">
+        <h2 data-i18n="pw.title">Password</h2>
+        <p id="pwStatus" class="muted"></p>
+        <label id="pwCurrentWrap"><span data-i18n="pw.current">Current password</span>
+          <input id="pwCurrent" type="password" autocomplete="current-password" /></label>
+        <label><span data-i18n="pw.new">New password</span>
+          <input id="pwNew" type="password" autocomplete="new-password" /></label>
+        <label><span data-i18n="pw.confirm">Confirm new password</span>
+          <input id="pwConfirm" type="password" autocomplete="new-password" /></label>
+        <div class="btn-row">
+          <button class="btn" type="submit" data-i18n="pw.save">Save password</button>        </div>
+      </form>
+
       <div class="stats">
         <div class="stat"><span class="stat-label" data-i18n="dash.today">Today's sales</span><strong id="statToday">₹0</strong></div>
         <div class="stat"><span class="stat-label" data-i18n="dash.month">This month</span><strong id="statMonth">₹0</strong></div>
@@ -126,6 +158,26 @@
       </div>
     </section>
 
+    <!-- REPORTS -->
+    <section id="tab-reports" class="tab">
+      <div class="card no-print">
+        <h2 data-i18n="rep.make">Make a report</h2>
+        <label><span data-i18n="rep.period">Report for</span>
+          <select id="repKind">
+            <option value="day" data-i18n="rep.day">Day</option>
+            <option value="week" data-i18n="rep.week">Week (Mon–Sun)</option>
+            <option value="month" data-i18n="rep.month">Month</option>
+            <option value="year" data-i18n="rep.year">Year</option>
+          </select></label>
+        <label><span data-i18n="rep.pickDate">Choose any date inside the period</span>
+          <input id="repDate" type="date" /></label>
+        <p id="repRange" class="muted"></p>
+        <button id="repDownload" class="btn" type="button" data-i18n="rep.download">Download PDF</button>
+        <p class="muted" data-i18n="rep.howto">A print window opens. Choose 'Save as PDF' as the printer, then tap Save.</p>
+      </div>
+      <div id="reportPreview" class="report"></div>
+    </section>
+
   </main>
 
   <nav class="bottom-nav">
@@ -133,6 +185,7 @@
     <button class="nav-btn" data-tab="stock" type="button" data-i18n="nav.stock">Stock</button>
     <button class="nav-btn" data-tab="sales" type="button" data-i18n="nav.sales">Sales</button>
     <button class="nav-btn" data-tab="bills" type="button" data-i18n="nav.bills">Bills</button>
+    <button class="nav-btn" data-tab="reports" type="button" data-i18n="nav.reports">Reports</button>
   </nav>
 
   <!-- Full-size bill photo viewer -->
@@ -144,6 +197,7 @@
 
   <div id="toast" class="toast" hidden></div>
 
+  <script src="auth.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Owner Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <div class="lock">
+    <form id="loginForm" class="card" autocomplete="off">
+      <h2 id="loginShop">Shop Manager</h2>
+      <p id="loginSub"><strong></strong></p>
+      <p id="loginHelp" class="muted" hidden></p>
+
+      <label><span data-i18n="login.password">Password</span>
+        <input id="loginPassword" type="password" required autocomplete="current-password" /></label>
+      <label id="confirmWrap" hidden><span data-i18n="login.confirm">Confirm password</span>
+        <input id="loginConfirm" type="password" autocomplete="new-password" /></label>
+
+      <button id="loginBtn" class="btn" type="submit">Log in</button>
+      <p id="loginError" class="error" hidden></p>
+      <p id="loginForgot" class="muted"></p>
+
+      <div class="btn-row">
+        <a class="link" href="index.html" data-i18n="login.back">← Back to website</a>
+        <button id="langBtn" class="link" type="button">ಕನ್ನಡ</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="login.js"></script>
+</body>
+</html>

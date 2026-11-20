@@ -28,7 +28,7 @@ body.kn { font-family: "Noto Sans Kannada", "Poppins", sans-serif; line-height: 
 /* TOP BAR */
 .top {
   position: sticky; top: 0; z-index: 50;
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
   background: var(--primary); color: #fff; padding: 12px 16px;
 }
 .top h1 { font-size: 1.15rem; }
@@ -130,7 +130,7 @@ input:focus, select:focus { outline: 2px solid var(--accent); border-color: var(
   background: #fff; box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
 }
 .nav-btn {
-  flex: 1; padding: 16px 4px; background: none; border: none; font: inherit; font-weight: 600;
+  flex: 1; padding: 16px 2px; background: none; border: none; font: inherit; font-size: 0.82rem; font-weight: 600;
   color: var(--muted); cursor: pointer; border-top: 3px solid transparent;
 }
 .nav-btn.active { color: var(--primary); border-top-color: var(--primary); }
@@ -142,6 +142,53 @@ input:focus, select:focus { outline: 2px solid var(--accent); border-color: var(
 }
 .viewer img { max-width: 100%; max-height: 80vh; object-fit: contain; }
 .viewer p { color: #fff; }
+/* REPORTS (on screen) */
+.report {
+  background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 16px; overflow-x: auto; margin-bottom: 16px;
+}
+.r-head { text-align: center; margin-bottom: 14px; }
+.r-head h2 { color: var(--primary); font-size: 1.3rem; }
+.r-head h3 { font-size: 1rem; margin-top: 2px; }
+.r-small { font-size: 0.8rem; color: var(--muted); }
+.report h4 {
+  margin: 18px 0 8px; color: var(--primary); font-size: 0.95rem;
+  border-bottom: 2px solid var(--accent); padding-bottom: 3px;
+}
+.r-sum { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 6px; }
+.r-sum div { background: #faf6f3; border-radius: 10px; padding: 8px 10px; display: flex; flex-direction: column; }
+.r-sum span { font-size: 0.75rem; color: var(--muted); }
+.r-sum strong { font-size: 1.05rem; }
+.rtable { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 6px; }
+.rtable th, .rtable td { padding: 6px 8px; border-bottom: 1px solid #eee; }
+.rtable th { background: #f6ecef; text-align: left; font-weight: 600; }
+.rtable .r { text-align: right; }
+.rtable tfoot td { font-weight: 700; border-top: 2px solid var(--primary); }
+.r-none { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+
+/* REPORTS (when printed or saved as PDF) */
+@media print {
+  @page { size: A4; margin: 14mm; }
+  .top, .banner, .bottom-nav, .toast, .viewer, .no-print { display: none !important; }
+  body { background: #fff; padding: 0; color: #000; }
+  main { width: 100%; padding: 0; }
+  .report { box-shadow: none; padding: 0; overflow: visible; margin: 0; }
+  .rtable { font-size: 9.5pt; }
+  .rtable thead { display: table-header-group; }
+  .rtable tr { page-break-inside: avoid; }
+  .report h4 { page-break-after: avoid; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* LOCK SCREEN */
+.lock {
+  position: fixed; inset: 0; z-index: 200; background: var(--bg); overflow: auto;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+.lock .card { width: min(380px, 100%); margin: 0; }
+.lock .muted { margin-top: 12px; font-size: 0.8rem; }
+.error { color: var(--bad); font-weight: 600; margin-top: 10px; }
+
 .toast {
   position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); z-index: 120;
   background: #2b2b2b; color: #fff; padding: 10px 18px; border-radius: 999px; max-width: 92%;
