@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Shop Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --primary:#9b1d4a; --primary-dark:#7a1439; --accent:#d9a441;
+  --bg:#f6f3f1; --card:#fff; --text:#222; --muted:#6b6b6b; --line:#ece6e9;
+  --ok:#1b8a4b; --warn:#c77700; --bad:#c62828; --radius:14px;
+  --shadow:0 2px 12px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;font-size:15px}
+
+/* Layout */
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.side{background:linear-gradient(180deg,var(--primary),var(--primary-dark));color:#fff;padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px}
+.brand{font-size:1.15rem;font-weight:700;padding:6px 10px 18px;overflow-wrap:anywhere}
+.brand small{display:block;font-weight:400;opacity:.75;font-size:.75rem}
+.nav-btn{background:none;border:none;color:#fff;text-align:left;padding:11px 12px;border-radius:10px;font:inherit;font-weight:500;cursor:pointer;display:flex;justify-content:space-between;align-items:center;opacity:.85}
+.nav-btn:hover{background:rgba(255,255,255,.12);opacity:1}
+.nav-btn.active{background:#fff;color:var(--primary);opacity:1;font-weight:600}
+.pill{background:var(--bad);color:#fff;border-radius:999px;font-size:.72rem;padding:1px 8px;font-weight:600}
+.side-foot{margin-top:auto;font-size:.75rem;opacity:.7;padding:10px}
+.main{padding:24px;max-width:1100px;width:100%}
+.page-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.page-head h1{font-size:1.4rem}
+.tab{display:none}.tab.active{display:block}
+
+/* Components */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:18px}
+.card h2{font-size:1rem;color:var(--primary);margin-bottom:12px}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.stat{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border-top:4px solid var(--accent)}
+.stat span{display:block;font-size:.78rem;color:var(--muted)}
+.stat strong{font-size:1.45rem;color:var(--primary)}
+.stat.red{border-top-color:var(--bad)}.stat.red strong{color:var(--bad)}
+label{display:block;font-size:.85rem;font-weight:500;margin-bottom:12px}
+label>span{display:block;color:var(--muted);margin-bottom:4px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font:inherit;background:#fff;color:var(--text)}
+input:focus,select:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+.btn{background:var(--primary);color:#fff;border:none;border-radius:999px;padding:10px 20px;font:inherit;font-weight:600;cursor:pointer;display:inline-block;text-align:center}
+.btn:hover{background:var(--primary-dark)}
+.btn.light{background:#f1e7ea;color:var(--primary)}.btn.light:hover{background:#e8d8dd}
+.btn.sm{padding:6px 14px;font-size:.82rem}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.link{background:none;border:none;color:var(--primary);font:inherit;font-weight:600;font-size:.84rem;cursor:pointer;padding:3px 6px}
+.link.danger{color:var(--bad)}
+.muted{color:var(--muted);font-size:.88rem}
+.empty{color:var(--muted);padding:10px 0}
+.badge{font-size:.75rem;font-weight:600;padding:3px 10px;border-radius:999px;background:#e3f4ea;color:var(--ok);white-space:nowrap}
+.badge.warn{background:#fff0d9;color:var(--warn)}.badge.bad{background:#fde3e3;color:var(--bad)}
+.banner{background:var(--bad);color:#fff;padding:11px 16px;border-radius:12px;font-weight:600;margin-bottom:16px;cursor:pointer}
+
+/* Tables */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{background:#f8f0f3;font-weight:600;color:var(--primary)}
+td.r,th.r{text-align:right}
+tfoot td{font-weight:700;border-top:2px solid var(--primary)}
+tr.low td:first-child{border-left:4px solid var(--warn)}
+tr.out td:first-child{border-left:4px solid var(--bad)}
+
+/* Purchase lines */
+.line{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
+.line label{margin:0}
+.thumb{width:54px;height:54px;object-fit:cover;border-radius:8px;cursor:pointer;background:#eee}
+.preview{max-width:100%;max-height:220px;border-radius:10px;margin-bottom:12px}
+
+/* Report */
+.report h2.title{text-align:center;color:var(--primary);font-size:1.35rem}
+.report .sub{text-align:center;color:var(--muted);margin-bottom:10px}
+.report h4{margin:20px 0 8px;color:var(--primary);border-bottom:2px solid var(--accent);padding-bottom:3px}
+.sumgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.sumgrid div{background:#faf6f3;border-radius:10px;padding:9px 12px}
+.sumgrid span{display:block;font-size:.75rem;color:var(--muted)}.sumgrid strong{font-size:1.05rem}
+
+/* Modal + toast */
+.viewer{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:100;display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px;overflow:auto}
+.viewer img{max-width:100%;max-height:80vh}.viewer p{color:#fff}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:999px;z-index:120;max-width:92%;text-align:center;box-shadow:var(--shadow)}
+
+/* Mobile */
+@media(max-width:820px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;padding:0;gap:0;z-index:60;box-shadow:0 -2px 12px rgba(0,0,0,.15)}
+  .brand,.side-foot{display:none}
+  .nav-btn{flex:1;justify-content:center;border-radius:0;padding:14px 2px;font-size:.78rem;gap:4px}
+  .nav-btn.active{background:#fff}
+  .main{padding:14px 14px 90px}
+  .g4{grid-template-columns:1fr 1fr}.g3,.g2{grid-template-columns:1fr}
+  .line{grid-template-columns:1fr 1fr}
+  .line .full{grid-column:1/-1}
+}
+
+/* Print: only the report */
+@media print{
+  @page{size:A4;margin:14mm}
+  .side,.page-head,.banner,.toast,.viewer,.noprint{display:none!important}
+  body{background:#fff}
+  .app{display:block}.main{padding:0;max-width:none}
+  .tab{display:none!important}#tab-reports{display:block!important}
+  .card{box-shadow:none;padding:0}
+  th,td{white-space:normal;font-size:9.5pt}
+  thead{display:table-header-group}tr{page-break-inside:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="side">
+    <div class="brand"><span id="brandName">Shop Manager</span><small>Stock &amp; Sales</small></div>
+    <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="nav-btn" data-tab="stock">Stock <span id="navLow" class="pill" hidden>0</span></button>
+    <button class="nav-btn" data-tab="purchases">Purchases</button>
+    <button class="nav-btn" data-tab="sales">Sales</button>
+    <button class="nav-btn" data-tab="reports">Reports</button>
+    <div class="side-foot">Data is saved in this browser only. Download a backup often.</div>
+  </aside>
+
+  <main class="main">
+
+    <div id="lowBanner" class="banner" hidden></div>
+
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="tab active">
+      <div class="page-head"><h1>Dashboard</h1>
+        <button id="alertBtn" class="btn light sm" type="button">Enable low-stock alerts</button></div>
+      <div class="grid g4" style="margin-bottom:18px">
+        <div class="stat"><span>Today's sales</span><strong id="stToday">₹0</strong></div>
+        <div class="stat"><span>This month</span><strong id="stMonth">₹0</strong></div>
+        <div class="stat"><span>Pieces in stock</span><strong id="stPieces">0</strong></div>
+        <div class="stat red"><span>Low stock items</span><strong id="stLow">0</strong></div>
+      </div>
+      <div class="grid g2">
+        <div class="card"><h2>Needs restocking</h2><div id="lowList"></div></div>
+        <div class="card"><h2>Settings &amp; backup</h2>
+          <form id="settingsForm" autocomplete="off">
+            <label><span>Shop name</span><input id="setName" maxlength="60" /></label>
+            <label><span>Low stock alert when pieces are fewer than</span>
+              <input id="setLow" type="number" min="1" step="1" value="3" /></label>
+            <button class="btn sm" type="submit">Save settings</button>
+          </form>
+          <hr style="border:none;border-top:1px solid var(--line);margin:16px 0" />
+          <div class="btn-row">
+            <button id="exportBtn" class="btn light sm" type="button">Download backup</button>
+            <label class="btn light sm" for="importFile" style="margin:0">Restore backup</label>
+            <input id="importFile" type="file" accept=".json,application/json" hidden />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STOCK -->
+    <section id="tab-stock" class="tab">
+      <div class="page-head"><h1>Stock</h1></div>
+      <form id="itemForm" class="card" autocomplete="off">
+        <h2 id="itemFormTitle">Add item</h2>
+        <input type="hidden" id="itemId" />
+        <div class="grid g3">
+          <label><span>Item name</span><input id="itemName" required maxlength="80" /></label>
+          <label><span>Category</span><input id="itemCategory" maxlength="40" placeholder="Saree, Kurti, Kids..." /></label>
+          <label><span>Quantity</span><input id="itemQty" type="number" min="0" step="1" value="0" /></label>
+          <label><span>Cost price (₹)</span><input id="itemCost" type="number" min="0" step="any" /></label>
+          <label><span>Selling price (₹)</span><input id="itemPrice" type="number" min="0" step="any" /></label>
+        </div>
+        <div class="btn-row">
+          <button class="btn" type="submit">Save item</button>
+          <button id="itemCancel" class="btn light" type="button" hidden>Cancel</button>
+        </div>
+      </form>
+      <div class="card">
+        <input id="stockSearch" type="search" placeholder="Search items or category" style="margin-bottom:12px" />
+        <div class="tw"><table>
+          <thead><tr><th>Item</th><th>Category</th><th class="r">Cost</th><th class="r">Price</th><th class="r">Qty</th><th>Status</th><th></th></tr></thead>
+          <tbody id="stockBody"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- PURCHASES -->
+    <section id="tab-purchases" class="tab">
+      <div class="page-head"><h1>Wholesale purchases</h1></div>
+      <form id="purForm" class="card" autocomplete="off">
+        <h2>Record clothes bought from wholesale</h2>
+        <div class="grid g3">
+          <label><span>Supplier</span><input id="purSupplier" maxlength="80" /></label>
+          <label><span>Date</span><input id="purDate" type="date" required /></label>
+          <label><span>Note</span><input id="purNote" maxlength="120" /></label>
+        </div>
+        <p class="muted" style="margin-bottom:8px">Add each type of cloth you bought. Stock goes up automatically. New names are added as new items.</p>
+        <div id="purLines"></div>
+        <button id="addLine" class="btn light sm" type="button" style="margin-bottom:14px">+ Add another item</button>
+        <label><span>Photo of the bill / list (optional)</span><input id="purPhoto" type="file" accept="image/*" /></label>
+        <img id="purPreview" class="preview" alt="" hidden />
+        <p><strong>Total: <span id="purTotal">₹0</span></strong></p>
+        <div class="btn-row" style="margin-top:10px"><button class="btn" type="submit">Save purchase &amp; add to stock</button></div>
+      </form>
+      <datalist id="itemsList"></datalist>
+      <div class="card">
+        <h2>Purchase history</h2>
+        <div class="tw"><table>
+          <thead><tr><th>Date</th><th>Supplier</th><th>Items</th><th class="r">Amount</th><th>Bill</th><th></th></tr></thead>
+          <tbody id="purBody"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- SALES -->
+    <section id="tab-sales" class="tab">
+      <div class="page-head"><h1>Sales</h1></div>
+      <form id="saleForm" class="card" autocomplete="off">
+        <h2>Record a sale</h2>
+        <div class="grid g4">
+          <label><span>Item</span><select id="saleItem" required></select></label>
+          <label><span>Quantity</span><input id="saleQty" type="number" min="1" step="1" value="1" required /></label>
+          <label><span>Price per piece (₹)</span><input id="salePrice" type="number" min="0" step="any" required /></label>
+          <label><span>Date</span><input id="saleDate" type="date" required /></label>
+        </div>
+        <button class="btn" type="submit">Record sale</button>
+      </form>
+      <div class="card">
+        <h2>Recent sales · today <span id="todayTotal">₹0</span></h2>
+        <div class="tw"><table>
+          <thead><tr><th>Date</th><th>Item</th><th class="r">Qty</th><th class="r">Price</th><th class="r">Total</th><th></th></tr></thead>
+          <tbody id="salesBody"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section id="tab-reports" class="tab">
+      <div class="page-head"><h1>Reports</h1></div>
+      <div class="card noprint">
+        <div class="grid g3">
+          <label><span>Report for</span>
+            <select id="repKind">
+              <option value="day">Day</option><option value="week">Week (Mon–Sun)</option>
+              <option value="month">Month</option><option value="year">Year</option>
+            </select></label>
+          <label><span>Pick any date in the period</span><input id="repDate" type="date" /></label>
+          <div><span class="muted" style="display:block;margin-bottom:4px">Covers</span><strong id="repRange"></strong></div>
+        </div>
+        <div class="btn-row">
+          <button id="repPrint" class="btn" type="button">Download PDF</button>
+          <button id="repCsv" class="btn light" type="button">Download Excel (CSV)</button>
+        </div>
+        <p class="muted" style="margin-top:8px">For PDF: a print window opens. Choose "Save as PDF" as the printer, then Save.</p>
+      </div>
+      <div id="report" class="card report"></div>
+    </section>
+
+  </main>
+</div>
+
+<div id="viewer" class="viewer" hidden>
+  <button id="viewerClose" class="btn light" type="button">Close</button>
+  <img id="viewerImg" alt="" /><p id="viewerCap"></p>
+</div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var LS="shopManagerPro.v1";
+var data={items:[],sales:[],purchases:[],settings:{shopName:"",low:3}};
+
+/* ---------- helpers ---------- */
+function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function num(v){var n=Number(v);return isFinite(n)?n:0}
+function money(n){return "₹"+num(n).toLocaleString("en-IN")}
+function pad(n){return String(n).padStart(2,"0")}
+function ymd(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function today(){return ymd(new Date())}
+function fromYmd(s){var p=String(s).split("-");return new Date(+p[0],+p[1]-1,+p[2])}
+function fmt(s){var p=String(s||"").split("-");return p.length===3?p[2]+"/"+p[1]+"/"+p[0]:(s||"")}
+function low(){return Math.max(1,Math.floor(num(data.settings.low))||3)}
+var tt;function toast(m){var e=$("toast");e.textContent=m;e.hidden=false;clearTimeout(tt);tt=setTimeout(function(){e.hidden=true},3500)}
+
+function load(){try{var r=localStorage.getItem(LS);if(r){var d=JSON.parse(r);
+  data={items:d.items||[],sales:d.sales||[],purchases:d.purchases||[],
+  settings:Object.assign({shopName:"",low:3},d.settings||{})}}}catch(e){}}
+function save(){try{localStorage.setItem(LS,JSON.stringify(data));return true}catch(e){toast("Could not save. Storage may be full.");return false}}
+
+/* ---------- bill photos (IndexedDB) ---------- */
+var dbp;
+function db(){if(!dbp)dbp=new Promise(function(res,rej){var q=indexedDB.open("shopManagerProPhotos",1);
+  q.onupgradeneeded=function(){q.result.createObjectStore("p",{keyPath:"id"})};
+  q.onsuccess=function(){res(q.result)};q.onerror=function(){rej(q.error)}});return dbp}
+function tx(mode,fn){return db().then(function(d){return new Promise(function(res,rej){
+  var t=d.transaction("p",mode),r=fn(t.objectStore("p"));
+  t.oncomplete=function(){res(r?r.result:undefined)};t.onerror=function(){rej(t.error)}})})}
+var pPut=function(id,u){return tx("readwrite",function(s){return s.put({id:id,url:u})})};
+var pGet=function(id){return tx("readonly",function(s){return s.get(id)}).then(function(r){return r?r.url:null})};
+var pDel=function(id){return tx("readwrite",function(s){return s.delete(id)})};
+var pAll=function(){return tx("readonly",function(s){return s.getAll()})};
+var pClr=function(){return tx("readwrite",function(s){return s.clear()})};
+function compress(file,max,q){return new Promise(function(res,rej){var im=new Image(),u=URL.createObjectURL(file);
+  im.onload=function(){var k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement("canvas");
+    c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+    URL.revokeObjectURL(u);res(c.toDataURL("image/jpeg",q))};
+  im.onerror=function(){URL.revokeObjectURL(u);rej(new Error("img"))};im.src=u})}
+
+/* ---------- low stock + notifications ---------- */
+function lowItems(){return data.items.filter(function(i){return i.qty<low()}).sort(function(a,b){return a.qty-b.qty})}
+function notify(title,body){try{
+  if(!("Notification"in window)||Notification.permission!=="granted")return;
+  var o={body:body,tag:"low-stock"};
+  if("serviceWorker"in navigator&&navigator.serviceWorker.getRegistration){
+    navigator.serviceWorker.getRegistration().then(function(r){if(r)r.showNotification(title,o);else new Notification(title,o)})
+      .catch(function(){try{new Notification(title,o)}catch(e){}});
+  }else new Notification(title,o);
+}catch(e){}}
+function checkBecameLow(item,prev){
+  if(item.qty<low()&&prev>=low()){
+    var m="Low stock: "+item.name+" ("+item.qty+" left)";
+    toast(m);notify(lowItems().length+" item(s) low on stock",m);
+  }
+}
+function alertBtn(){var on="Notification"in window&&Notification.permission==="granted";
+  $("alertBtn").textContent=on?"Low-stock alerts are on":"Enable low-stock alerts"}
+$("alertBtn").addEventListener("click",function(){
+  if(!("Notification"in window)){toast("This browser does not support alerts. The red banner still shows.");return}
+  if(Notification.permission==="denied"){toast("Alerts are blocked in your browser settings.");return}
+  if(Notification.permission==="granted"){toast("Alerts are already on");return}
+  Notification.requestPermission().then(alertBtn).catch(function(){});
+});
+
+/* ---------- render ---------- */
+function shopTitle(){return data.settings.shopName||"Shop Manager"}
+function badgeFor(i){return i.qty===0?'<span class="badge bad">Out of stock</span>':
+  i.qty<low()?'<span class="badge warn">Low stock</span>':'<span class="badge">OK</span>'}
+
+function renderTop(){
+  var l=lowItems(),b=$("lowBanner");
+  $("brandName").textContent=shopTitle();
+  b.hidden=!l.length;b.textContent="⚠ "+l.length+" item(s) low on stock. Tap to see.";
+  $("navLow").hidden=!l.length;$("navLow").textContent=l.length;
+  document.title=(l.length?"("+l.length+") ":"")+shopTitle();
+}
+function renderDash(){
+  var t=today(),m=t.slice(0,7),a=0,b=0;
+  data.sales.forEach(function(s){var x=s.qty*s.price;if(s.date===t)a+=x;if(String(s.date).slice(0,7)===m)b+=x});
+  $("stToday").textContent=money(a);$("stMonth").textContent=money(b);
+  $("stPieces").textContent=data.items.reduce(function(s,i){return s+i.qty},0);
+  var l=lowItems();$("stLow").textContent=l.length;
+  $("lowList").innerHTML=l.length?l.map(function(i){return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><div><strong>'+esc(i.name)+'</strong><br><span class="muted">'+esc(i.category||"")+'</span></div><span class="badge '+(i.qty===0?"bad":"warn")+'">'+i.qty+' left</span></div>'}).join(""):'<p class="empty">Nothing is low.</p>';
+}
+function renderStock(){
+  var q=$("stockSearch").value.trim().toLowerCase();
+  var list=data.items.filter(function(i){return !q||(i.name+" "+(i.category||"")).toLowerCase().indexOf(q)>-1})
+    .sort(function(a,b){return a.name.localeCompare(b.name)});
+  $("stockBody").innerHTML=list.length?list.map(function(i){
+    var c=i.qty===0?"out":i.qty<low()?"low":"";
+    return '<tr class="'+c+'"><td><strong>'+esc(i.name)+'</strong></td><td>'+esc(i.category||"")+'</td><td class="r">'+money(i.cost)+'</td><td class="r">'+money(i.price)+'</td><td class="r">'+i.qty+'</td><td>'+badgeFor(i)+'</td><td>'+
+      '<button class="link" data-a="add" data-id="'+i.id+'">+ Stock</button><button class="link" data-a="edit" data-id="'+i.id+'">Edit</button><button class="link danger" data-a="del" data-id="'+i.id+'">Delete</button></td></tr>'}).join("")
+    :'<tr><td colspan="7" class="empty">'+(data.items.length?"No match.":"No items yet. Add one above or record a purchase.")+'</td></tr>';
+  $("itemsList").innerHTML=data.items.map(function(i){return '<option value="'+esc(i.name)+'">'}).join("");
+}
+function renderSaleSelect(){
+  var s=$("saleItem"),keep=s.value;
+  s.innerHTML='<option value="">Choose item</option>'+data.items.slice().sort(function(a,b){return a.name.localeCompare(b.name)})
+    .map(function(i){return '<option value="'+i.id+'"'+(i.qty===0?" disabled":"")+'>'+esc(i.name)+' ('+i.qty+')</option>'}).join("");
+  if(keep&&data.items.some(function(i){return i.id===keep&&i.qty>0}))s.value=keep;
+}
+function renderSales(){
+  var t=today(),tot=0;data.sales.forEach(function(s){if(s.date===t)tot+=s.qty*s.price});
+  $("todayTotal").textContent=money(tot);
+  var l=data.sales.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))||b.ts-a.ts}).slice(0,60);
+  $("salesBody").innerHTML=l.length?l.map(function(s){return '<tr><td>'+fmt(s.date)+'</td><td>'+esc(s.name)+'</td><td class="r">'+s.qty+'</td><td class="r">'+money(s.price)+'</td><td class="r">'+money(s.qty*s.price)+'</td><td><button class="link danger" data-a="delsale" data-id="'+s.id+'">Delete</button></td></tr>'}).join("")
+    :'<tr><td colspan="6" class="empty">No sales yet.</td></tr>';
+}
+function renderPurchases(){
+  $("purBody").innerHTML=data.purchases.length?data.purchases.map(function(p){
+    var items=p.lines.map(function(l){return esc(l.name)+" × "+l.qty}).join(", ");
+    return '<tr><td>'+fmt(p.date)+'</td><td>'+esc(p.supplier||"—")+'</td><td style="white-space:normal;min-width:180px">'+items+(p.note?'<br><span class="muted">'+esc(p.note)+'</span>':"")+'</td><td class="r">'+money(p.total)+'</td><td>'+(p.photoId?'<img class="thumb" alt="" data-photo="'+p.photoId+'">':"")+'</td><td><button class="link danger" data-a="delpur" data-id="'+p.id+'">Delete</button></td></tr>'}).join("")
+    :'<tr><td colspan="6" class="empty">No purchases saved yet.</td></tr>';
+  document.querySelectorAll("#purBody img[data-photo]").forEach(function(im){
+    pGet(im.getAttribute("data-photo")).then(function(u){if(u)im.src=u}).catch(function(){})});
+}
+function renderAll(){renderTop();renderDash();renderStock();renderSaleSelect();renderSales();renderPurchases();renderReport()}
+
+/* ---------- tabs ---------- */
+function showTab(n){
+  document.querySelectorAll(".tab").forEach(function(s){s.classList.toggle("active",s.id==="tab-"+n)});
+  document.querySelectorAll(".nav-btn").forEach(function(b){b.classList.toggle("active",b.dataset.tab===n)});
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".nav-btn").forEach(function(b){b.addEventListener("click",function(){showTab(b.dataset.tab)})});
+$("lowBanner").addEventListener("click",function(){showTab("dashboard")});
+
+/* ---------- settings ---------- */
+$("settingsForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  data.settings={shopName:$("setName").value.trim(),low:Math.max(1,Math.floor(num($("setLow").value))||3)};
+  if(save())toast("Saved");renderAll();
+});
+
+/* ---------- stock ---------- */
+function resetItem(){$("itemForm").reset();$("itemId").value="";$("itemQty").value="0";$("itemFormTitle").textContent="Add item";$("itemCancel").hidden=true}
+$("itemForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  var f={name:$("itemName").value.trim(),category:$("itemCategory").value.trim(),
+    cost:Math.max(0,num($("itemCost").value)),price:Math.max(0,num($("itemPrice").value)),
+    qty:Math.max(0,Math.floor(num($("itemQty").value)))};
+  if(!f.name){toast("Enter an item name");return}
+  var id=$("itemId").value,item,prev=Infinity;
+  if(id){item=data.items.find(function(i){return i.id===id});if(item){prev=item.qty;Object.assign(item,f)}}
+  if(!item){item=Object.assign({id:uid()},f);data.items.push(item)}
+  if(save())toast("Saved");resetItem();renderAll();checkBecameLow(item,prev);
+});
+$("itemCancel").addEventListener("click",resetItem);
+$("stockSearch").addEventListener("input",renderStock);
+$("stockBody").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-a]");if(!b)return;
+  var item=data.items.find(function(i){return i.id===b.dataset.id});if(!item)return;
+  if(b.dataset.a==="add"){
+    var v=parseInt(prompt('How many pieces to add to "'+item.name+'"?',"1"),10);
+    if(v>0){item.qty+=v;save();renderAll()}
+  }else if(b.dataset.a==="edit"){
+    $("itemId").value=item.id;$("itemName").value=item.name;$("itemCategory").value=item.category||"";
+    $("itemCost").value=item.cost||"";$("itemPrice").value=item.price||"";$("itemQty").value=item.qty;
+    $("itemFormTitle").textContent="Edit item";$("itemCancel").hidden=false;window.scrollTo(0,0);
+  }else if(b.dataset.a==="del"){
+    if(confirm('Delete "'+item.name+'"?')){data.items=data.items.filter(function(i){return i.id!==item.id});save();renderAll()}
+  }
+});
+
+/* ---------- purchases ---------- */
+function addLine(v){
+  v=v||{};var d=document.createElement("div");d.className="line";
+  d.innerHTML='<label class="full"><span>Item name</span><input class="l-name" list="itemsList" maxlength="80" value="'+esc(v.name||"")+'"></label>'+
+    '<label><span>Qty</span><input class="l-qty" type="number" min="1" step="1" value="'+(v.qty||1)+'"></label>'+
+    '<label><span>Cost / piece (₹)</span><input class="l-cost" type="number" min="0" step="any" value="'+(v.cost||"")+'"></label>'+
+    '<label><span>Sell price (₹)</span><input class="l-sell" type="number" min="0" step="any" placeholder="optional"></label>'+
+    '<button class="link danger" type="button">Remove</button>';
+  d.querySelector(".l-name").addEventListener("change",function(){
+    var it=data.items.find(function(i){return i.name.toLowerCase()===d.querySelector(".l-name").value.trim().toLowerCase()});
+    if(it){if(!d.querySelector(".l-cost").value)d.querySelector(".l-cost").value=it.cost||"";d.querySelector(".l-sell").value=it.price||"";calcTotal()}
+  });
+  d.querySelector("button").addEventListener("click",function(){if($("purLines").children.length>1){d.remove();calcTotal()}});
+  d.addEventListener("input",calcTotal);
+  $("purLines").appendChild(d);
+}
+function lineVals(){return Array.prototype.map.call($("purLines").children,function(d){
+  return {name:d.querySelector(".l-name").value.trim(),qty:Math.floor(num(d.querySelector(".l-qty").value)),
+    cost:Math.max(0,num(d.querySelector(".l-cost").value)),sell:Math.max(0,num(d.querySelector(".l-sell").value))}
+}).filter(function(l){return l.name&&l.qty>0})}
+function calcTotal(){$("purTotal").textContent=money(lineVals().reduce(function(s,l){return s+l.qty*l.cost},0))}
+$("addLine").addEventListener("click",function(){addLine()});
+$("purPhoto").addEventListener("change",function(){var f=$("purPhoto").files[0],p=$("purPreview");
+  if(f){p.src=URL.createObjectURL(f);p.hidden=false}else p.hidden=true});
+
+function resetPur(){$("purForm").reset();$("purDate").value=today();$("purLines").innerHTML="";addLine();$("purPreview").hidden=true;calcTotal()}
+$("purForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  var lines=lineVals();if(!lines.length){toast("Add at least one item with a name and quantity");return}
+  var file=$("purPhoto").files[0];
+  var job=file?compress(file,1400,.8).then(function(u){var id=uid();return pPut(id,u).then(function(){return id})}):Promise.resolve(null);
+  job.then(function(photoId){
+    var saved=[],total=0,becameLow=[];
+    lines.forEach(function(l){
+      var it=data.items.find(function(i){return i.name.toLowerCase()===l.name.toLowerCase()});
+      if(it){it.qty+=l.qty;if(l.cost)it.cost=l.cost;if(l.sell)it.price=l.sell}
+      else{it={id:uid(),name:l.name,category:"",cost:l.cost,price:l.sell,qty:l.qty};data.items.push(it)}
+      saved.push({itemId:it.id,name:it.name,qty:l.qty,cost:l.cost});total+=l.qty*l.cost;
+    });
+    data.purchases.unshift({id:uid(),date:$("purDate").value||today(),supplier:$("purSupplier").value.trim(),
+      note:$("purNote").value.trim(),lines:saved,total:total,photoId:photoId});
+    if(save())toast("Purchase saved. Stock updated.");
+    resetPur();renderAll();
+  }).catch(function(){toast("Could not save the photo. Try a smaller image.")});
+});
+$("purBody").addEventListener("click",function(e){
+  var del=e.target.closest('button[data-a="delpur"]');
+  if(del){
+    var p=data.purchases.find(function(x){return x.id===del.dataset.id});if(!p)return;
+    if(!confirm("Delete this purchase? The pieces are also taken off stock."))return;
+    p.lines.forEach(function(l){var it=data.items.find(function(i){return i.id===l.itemId});if(it)it.qty=Math.max(0,it.qty-l.qty)});
+    data.purchases=data.purchases.filter(function(x){return x.id!==p.id});save();
+    if(p.photoId)pDel(p.photoId).catch(function(){});renderAll();return;
+  }
+  var im=e.target.closest("img.thumb");
+  if(im&&im.src){$("viewerImg").src=im.src;$("viewerCap").textContent="";$("viewer").hidden=false}
+});
+$("viewerClose").addEventListener("click",function(){$("viewer").hidden=true});
+
+/* ---------- sales ---------- */
+$("saleItem").addEventListener("change",function(){
+  var it=data.items.find(function(i){return i.id===$("saleItem").value});if(it)$("salePrice").value=it.price||"";
+});
+$("saleForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  var it=data.items.find(function(i){return i.id===$("saleItem").value});if(!it)return;
+  var q=Math.floor(num($("saleQty").value));if(q<1)return;
+  if(q>it.qty){toast("Only "+it.qty+" left in stock.");return}
+  var prev=it.qty;it.qty-=q;
+  data.sales.push({id:uid(),ts:Date.now(),itemId:it.id,name:it.name,qty:q,
+    price:Math.max(0,num($("salePrice").value)),cost:num(it.cost),date:$("saleDate").value||today()});
+  if(save())toast("Sale recorded");
+  $("saleQty").value="1";$("saleItem").value="";$("salePrice").value="";
+  renderAll();checkBecameLow(it,prev);
+});
+$("salesBody").addEventListener("click",function(e){
+  var b=e.target.closest('button[data-a="delsale"]');if(!b)return;
+  var s=data.sales.find(function(x){return x.id===b.dataset.id});
+  if(!s||!confirm("Delete this sale? The pieces go back to stock."))return;
+  var it=data.items.find(function(i){return i.id===s.itemId});if(it)it.qty+=s.qty;
+  data.sales=data.sales.filter(function(x){return x.id!==s.id});save();renderAll();
+});
+
+/* ---------- reports ---------- */
+function range(kind,ds){
+  var d=fromYmd(ds),y=d.getFullYear(),m=d.getMonth(),dd=d.getDate();
+  if(kind==="day")return[ymd(d),ymd(d)];
+  if(kind==="week"){var back=(d.getDay()+6)%7;return[ymd(new Date(y,m,dd-back)),ymd(new Date(y,m,dd-back+6))]}
+  if(kind==="month")return[ymd(new Date(y,m,1)),ymd(new Date(y,m+1,0))];
+  return[ymd(new Date(y,0,1)),ymd(new Date(y,11,31))];
+}
+function monthLabel(y,m){try{return new Date(y,m,1).toLocaleDateString("en-IN",{month:"long",year:"numeric"})}catch(e){return pad(m+1)+"/"+y}}
+function periodLabel(k,s,e){var d=fromYmd(s);
+  if(k==="day")return fmt(s);if(k==="week")return fmt(s)+" – "+fmt(e);
+  if(k==="month")return monthLabel(d.getFullYear(),d.getMonth());return String(d.getFullYear())}
+function tbl(heads,al,rows,foot){
+  var c=function(t,v,i){return "<"+t+' class="'+al[i]+'">'+esc(v)+"</"+t+">"};
+  var h='<div class="tw"><table><thead><tr>'+heads.map(function(x,i){return c("th",x,i)}).join("")+"</tr></thead><tbody>"+
+    rows.map(function(r){return "<tr>"+r.map(function(x,i){return c("td",x,i)}).join("")+"</tr>"}).join("")+"</tbody>";
+  if(foot)h+="<tfoot><tr>"+foot.map(function(x,i){return c("td",x,i)}).join("")+"</tr></tfoot>";
+  return h+"</table></div>";
+}
+function kv(l,v){return "<div><span>"+esc(l)+"</span><strong>"+esc(v)+"</strong></div>"}
+function sec(t){return "<h4>"+esc(t)+"</h4>"}
+function none(){return '<p class="muted">Nothing recorded in this period.</p>'}
+
+function choice(){var k=$("repKind").value||"day",r=range(k,$("repDate").value||today());return{kind:k,start:r[0],end:r[1]}}
+function inR(d,s,e){d=String(d);return d>=s&&d<=e}
+function reportData(c){
+  var sales=data.sales.filter(function(s){return inR(s.date,c.start,c.end)}).sort(function(a,b){return String(a.date).localeCompare(String(b.date))||a.ts-b.ts});
+  var purs=data.purchases.filter(function(p){return inR(p.date,c.start,c.end)}).sort(function(a,b){return String(a.date).localeCompare(String(b.date))});
+  return{sales:sales,purs:purs};
+}
+function renderReport(){
+  var c=choice(),rd=reportData(c),sales=rd.sales,purs=rd.purs;
+  $("repRange").textContent=fmt(c.start)+(c.start===c.end?"":" – "+fmt(c.end));
+  var tot=0,pcs=0,profit=0,bought=0;
+  sales.forEach(function(s){tot+=s.qty*s.price;pcs+=s.qty;profit+=s.qty*(s.price-num(s.cost))});
+  purs.forEach(function(p){bought+=num(p.total)});
+  var h='<h2 class="title">'+esc(shopTitle())+'</h2><p class="sub">Sales &amp; Stock Report · <strong>'+esc(periodLabel(c.kind,c.start,c.end))+'</strong> · Generated '+fmt(today())+'</p>';
+  h+=sec("Summary")+'<div class="sumgrid">'+kv("Total sales",money(tot))+kv("Number of sales",sales.length)+kv("Pieces sold",pcs)+kv("Estimated profit",money(profit))+kv("Bought from wholesale",money(bought))+"</div>";
+
+  if(sales.length){
+    if(c.kind!=="day"){
+      var g={};sales.forEach(function(s){var k=c.kind==="year"?String(s.date).slice(0,7):String(s.date);
+        var x=g[k]||(g[k]={q:0,a:0});x.q+=s.qty;x.a+=s.qty*s.price});
+      var keys=Object.keys(g).sort();
+      h+=sec(c.kind==="year"?"Sales by month":"Sales by day")+tbl([c.kind==="year"?"Month":"Date","Qty","Total"],["l","r","r"],
+        keys.map(function(k){return[c.kind==="year"?monthLabel(+k.slice(0,4),+k.slice(5,7)-1):fmt(k),String(g[k].q),money(g[k].a)]}),["Total",String(pcs),money(tot)]);
+    }
+    var bi={};sales.forEach(function(s){var k=s.itemId||s.name,x=bi[k]||(bi[k]={n:s.name,q:0,a:0});x.q+=s.qty;x.a+=s.qty*s.price});
+    var bl=Object.keys(bi).map(function(k){return bi[k]}).sort(function(a,b){return b.a-a.a});
+    h+=sec("Sales by item")+tbl(["Item","Qty","Total"],["l","r","r"],bl.map(function(x){return[x.n,String(x.q),money(x.a)]}),["Total",String(pcs),money(tot)]);
+    h+=sec("All sales")+tbl(["Date","Item","Qty","Price","Total"],["l","l","r","r","r"],
+      sales.map(function(s){return[fmt(s.date),s.name,String(s.qty),money(s.price),money(s.qty*s.price)]}),["","Total",String(pcs),"",money(tot)]);
+  }else h+=sec("Sales")+none();
+
+  var items=data.items.slice().sort(function(a,b){return a.name.localeCompare(b.name)});
+  var P=0,VC=0,VS=0,L=0;items.forEach(function(i){P+=i.qty;VC+=i.qty*num(i.cost);VS+=i.qty*num(i.price);if(i.qty<low())L++});
+  h+=sec("Current stock")+'<p class="muted">Stock is shown as it is today. Past stock levels are not recorded.</p><div class="sumgrid" style="margin:8px 0">'+
+    kv("Total pieces",P)+kv("Low stock items",L)+kv("Value at cost",money(VC))+kv("Value at selling price",money(VS))+"</div>";
+  h+=items.length?tbl(["Item","Category","Qty","Cost","Price","Value","Status"],["l","l","r","r","r","r","l"],
+    items.map(function(i){return[i.name,i.category||"",String(i.qty),money(i.cost),money(i.price),money(i.qty*num(i.cost)),i.qty===0?"Out of stock":i.qty<low()?"Low stock":"OK"]})):none();
+
+  h+=sec("Wholesale purchases");
+  if(purs.length){
+    var rows=[];purs.forEach(function(p){p.lines.forEach(function(l,ix){rows.push([ix?"":fmt(p.date),ix?"":(p.supplier||"—"),l.name,String(l.qty),money(l.cost),money(l.qty*l.cost)])})});
+    h+=tbl(["Date","Supplier","Item","Qty","Cost / piece","Amount"],["l","l","l","r","r","r"],rows,["","","","","Total",money(bought)]);
+  }else h+=none();
+  $("report").innerHTML=h;
+}
+$("repKind").addEventListener("change",renderReport);
+$("repDate").addEventListener("change",renderReport);
+$("repDate").addEventListener("input",renderReport);
+$("repPrint").addEventListener("click",function(){
+  var c=choice();renderReport();
+  var old=document.title;document.title="Report-"+c.start+(c.start===c.end?"":"_to_"+c.end);
+  window.addEventListener("afterprint",function(){document.title=old;renderTop()},{once:true});
+  window.print();
+});
+$("repCsv").addEventListener("click",function(){
+  var c=choice(),rd=reportData(c);
+  var q=function(v){v=String(v==null?"":v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  var rows=[["Type","Date","Item","Qty","Price / Cost","Total"]];
+  rd.sales.forEach(function(s){rows.push(["Sale",s.date,s.name,s.qty,s.price,s.qty*s.price])});
+  rd.purs.forEach(function(p){p.lines.forEach(function(l){rows.push(["Purchase",p.date,l.name,l.qty,l.cost,l.qty*l.cost])})});
+  rows.push([]);rows.push(["Current stock"]);rows.push(["Item","Category","Qty","Cost","Price"]);
+  data.items.forEach(function(i){rows.push([i.name,i.category||"",i.qty,i.cost,i.price])});
+  var blob=new Blob(["\ufeff"+rows.map(function(r){return r.map(q).join(",")}).join("\n")],{type:"text/csv"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="report-"+c.start+(c.start===c.end?"":"_to_"+c.end)+".csv";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000);
+});
+
+/* ---------- backup ---------- */
+$("exportBtn").addEventListener("click",function(){
+  pAll().catch(function(){return[]}).then(function(ph){
+    var p={version:1,exported:new Date().toISOString(),items:data.items,sales:data.sales,purchases:data.purchases,settings:data.settings,photos:ph||[]};
+    var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(p)],{type:"application/json"}));
+    a.download="shop-backup-"+today()+".json";document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href)},2000);
+  });
+});
+$("importFile").addEventListener("change",function(e){
+  var f=e.target.files[0];if(!f)return;var r=new FileReader();
+  r.onload=function(){
+    var d;try{d=JSON.parse(r.result)}catch(x){toast("This file is not a valid backup.");return}
+    if(!d||!Array.isArray(d.items)||!Array.isArray(d.sales)){toast("This file is not a valid backup.");return}
+    if(!confirm("This replaces all current data. Continue?"))return;
+    data={items:d.items,sales:d.sales,purchases:d.purchases||d.bills||[],settings:Object.assign({shopName:"",low:3},d.settings||{})};
+    data.purchases.forEach(function(p){if(!p.lines)p.lines=[]});
+    save();$("setName").value=data.settings.shopName||"";$("setLow").value=low();
+    pClr().catch(function(){}).then(function(){return Promise.all((d.photos||[]).map(function(p){return pPut(p.id,p.url||p.dataUrl)}))})
+      .catch(function(){}).then(function(){renderAll();toast("Backup restored")});
+  };
+  r.readAsText(f);e.target.value="";
+});
+
+/* ---------- start ---------- */
+load();
+$("setName").value=data.settings.shopName||"";$("setLow").value=low();
+$("saleDate").value=today();$("repDate").value=today();
+resetPur();alertBtn();renderAll();
+var ln=lowItems();
+if(ln.length)notify(ln.length+" item(s) low on stock",ln.map(function(i){return i.name}).join(", "));
+})();
+</script>
+</body>
+</html>
